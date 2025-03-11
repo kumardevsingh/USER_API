@@ -1,7 +1,8 @@
-import express, { Application } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { appRoutes } from './globals/routes/appRoutes';
+import { StatusCodes } from 'http-status-codes';
 
 export default class Server {
   app: Application;
@@ -36,7 +37,15 @@ export default class Server {
   private routes() {
     appRoutes(this.app);
   }
-  private setupGlobalErrors() {}
+  private setupGlobalErrors() {
+    //all request type
+    this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
+      res.status(StatusCodes.NOT_FOUND).json({
+        message: `Can't find ${req.originalUrl} on this server with method ${req.method}!`,
+      });
+      next();
+    });
+  }
 
   listenServer() {
     const port = process.env.PORT || 3000;
