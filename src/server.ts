@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { appRoutes } from './globals/routes/appRoutes';
 import { StatusCodes } from 'http-status-codes';
+import { CustomError, NotFoundException } from './globals/cores/error.core';
 
 export default class Server {
   app: Application;
@@ -40,11 +41,26 @@ export default class Server {
   private setupGlobalErrors() {
     //all request type
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
-      res.status(StatusCodes.NOT_FOUND).json({
-        message: `Can't find ${req.originalUrl} on this server with method ${req.method}!`,
-      });
-      next();
+      // res.status(StatusCodes.NOT_FOUND).json({
+      //   message: `Can't find ${req.originalUrl} on this server with method ${req.method}!`,
+      // });
+      next(
+        new NotFoundException(
+          `Can't find ${req.originalUrl} on this server with method ${req.method}!`,
+        ),
+      );
     });
+    this.app.use(
+      (error: any, req: Request, res: Response, next: NextFunction) => {
+        if (error instanceof CustomError) {
+          res.status(error.statusCode).json({ message: error.message });
+        } else {
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: error.message,
+          });
+        }
+      },
+    );
   }
 
   listenServer() {
