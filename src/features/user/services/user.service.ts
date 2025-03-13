@@ -2,6 +2,7 @@ import { User } from '@prisma/client';
 import prisma from '../../../globals/prisma';
 
 import { BadRequestException } from '../../../globals/cores/error.core';
+import createUserSchema from '../schemas/createuser.schema';
 
 class UserService {
   async getAll(): Promise<User[]> {
