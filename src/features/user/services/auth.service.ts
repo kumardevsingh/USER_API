@@ -1,6 +1,7 @@
 import prisma from '../../../globals/prisma';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { BadRequestException } from '../../../globals/cores/error.core';
+import { generateToken } from '../../../globals/helpers/jwt.helper';
 
 class AuthService {
   async signup(requestBody: any) {
@@ -16,15 +17,29 @@ class AuthService {
         role: 'CANDIDATE',
       },
     });
-    console.log('====== User created ========== :', user);
-    const accessToken = jwt.sign(
-      { name, email, id: user.id, role: user.role },
-      process.env.JWT_SECRET! as string,
-      {
-        expiresIn: '1h',
-      },
-    );
+    const accessToken = generateToken(user);
     return accessToken;
+  }
+
+  async signin(requestBody: any) {
+    const { email, password } = requestBody;
+    const user = await this.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException(`email ${email} not found`);
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw new BadRequestException('Invalid password');
+    }
+    const accessToken = generateToken(user);
+    return accessToken;
+  }
+  async findByEmail(email: string) {
+    return await prisma.user.findFirst({
+      where: { email },
+    });
   }
 }
 
