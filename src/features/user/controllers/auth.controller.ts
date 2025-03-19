@@ -17,6 +17,13 @@ class AuthController {
     sendTokenToCookie(res, accessToken);
     res.status(StatusCodes.OK).json({ message: 'User logged in successfully' });
   }
+
+  async getCurrentUser(req: Request, res: Response, next: NextFunction) {
+    res.status(StatusCodes.OK).json({
+      message: 'Current user retrieved successfully',
+      data: req.currentUser, // Assuming req.user is populated by authentication middleware
+    });
+  }
 }
 
 export default new AuthController();
