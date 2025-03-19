@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { appRoutes } from './globals/routes/appRoutes';
 import { StatusCodes } from 'http-status-codes';
 import { CustomError, NotFoundException } from './globals/cores/error.core';
+import CookieParser from 'cookie-parser';
 
 export default class Server {
   app: Application;
@@ -34,6 +35,7 @@ export default class Server {
 
   private middlewares() {
     this.app.use(express.json());
+    this.app.use(CookieParser());
   }
   private routes() {
     appRoutes(this.app);
