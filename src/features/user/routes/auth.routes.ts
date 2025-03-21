@@ -12,5 +12,5 @@ authRoutes.get(
   verifyUser,
   asyncWrapper(authController.getCurrentUser),
 );
-
+authRoutes.post('/logout', verifyUser, asyncWrapper(authController.logout));
 export default authRoutes;

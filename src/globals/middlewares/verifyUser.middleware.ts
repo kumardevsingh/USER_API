@@ -9,7 +9,8 @@ export async function verifyUser(
 ) {
   const accessToken = req.cookies['accessToken'];
   if (!accessToken) {
-    throw new BadRequestException('No access token provided');
+    next(new BadRequestException('Please login!'));
+    return;
   }
   const user = (await jwt.verify(
     accessToken,

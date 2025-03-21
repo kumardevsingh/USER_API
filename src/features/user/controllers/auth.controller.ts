@@ -24,6 +24,13 @@ class AuthController {
       data: req.currentUser, // Assuming req.user is populated by authentication middleware
     });
   }
+
+  async logout(req: Request, res: Response, next: NextFunction) {
+    res.clearCookie('accessToken');
+    res
+      .status(StatusCodes.OK)
+      .json({ message: 'User logged out successfully' });
+  }
 }
 
 export default new AuthController();
